@@ -1,0 +1,33 @@
+QWidget#content {
+    
+}
+
+QWidget#insert_command {
+
+}
+
+QPushButton#execute_button {
+    background-color: #BC00FF;
+    border-radius: 8px;
+    /* margin-left: 10px; */
+    font-weight: bold;
+    padding: 10px 0 10px 0;
+}
+
+QPushButton#execute_button:hover {
+    background-color: #AD20DF;
+}
+
+QPushButton#add_box_button {
+    /* background-color: #BC00FF; */
+    border-radius: 8px;
+}
+
+QPushButton#cancel_executing_button {
+    background-color: @special_2;
+    border-radius: 8px;
+}
+
+QPushButton#cancel_executing_button:hover {
+    background-color: @special_2_darker;
+}

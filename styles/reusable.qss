@@ -1,0 +1,66 @@
+QPushButton {
+    color: @text;
+    font-size: 16px;
+    border: 0;
+}
+
+QPushButton:hover {
+    color: @text_darker;
+}
+
+/* QPushButton#button {
+    background-color: #BC00FF;
+    border-radius: 8px;
+} */
+
+QPushButton#button::hover {
+    background-color: @special_2;
+}
+
+QPushButton#exit_button::hover {
+    background-color: @special_2;
+}
+
+QPushButton#minimize_button::hover {
+    background-color: @primary;
+}
+
+QLabel {
+    
+}
+
+QLineEdit {
+    background-color: @primary;
+    border: 0;
+    border-style: solid;
+    border-color: @text_darker;
+    border-width: 0 0 1px 0;
+    font-size: 16px;
+}
+
+QLineEdit#input_box_not_empty {
+    /* color: #DFDFDF; */
+    color: red;
+}
+
+QLineEdit#input_box {
+    color: @text;
+}
+
+QCheckBox#check_box {
+    color: @text;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+QCheckBox#check_box::indicator {
+    background-image: url("assets/icons/check_box_unchecked.svg");
+    width: 48px;
+    height: 48px;
+}
+
+QCheckBox#check_box::indicator::checked {
+    background-image: url("assets/icons/check_box_checked.svg");
+    width: 48px;
+    height: 48px;
+}

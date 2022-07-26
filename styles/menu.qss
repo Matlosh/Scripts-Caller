@@ -1,0 +1,12 @@
+QWidget {
+    background-color: @primary_darker;
+}
+
+QWidget#menu_item {
+    font-size: 16px;
+    color: white;
+}
+
+QWidget#menu_item:hover {
+    background-color: @primary;
+}

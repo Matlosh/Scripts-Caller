@@ -1,0 +1,10 @@
+@primary: #222831;
+@primary_darker: #1E232B;
+@secondary: #393E46;
+@special: #FFD369;
+@special_2: #C70039;
+@special_2_darker: #AE0032;
+@tertiary: #EEEEEE;
+
+@text: #ffffff;
+@text_darker: #DFDFDF;

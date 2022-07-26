@@ -45,13 +45,13 @@ class ScriptsCaller(QMainWindow):
         # main_layout.addLayout(menu_n_content_layout)
         main_layout.setSpacing(0)
 
-        # Application Menu
-        menu = Menu()
-        main_layout.addWidget(menu, 1, 0)
-
         # Application Content
         content = Content()
         main_layout.addWidget(content, 1, 1, 1, 3)
+
+        # Application Menu
+        menu = Menu(content)
+        main_layout.addWidget(menu, 1, 0)
 
         # menu_n_content_layout.setColumnStretch(1, 1)
         # menu_n_content_layout.setSpacing(0)

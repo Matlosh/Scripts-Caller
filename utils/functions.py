@@ -42,52 +42,6 @@ def read_stylesheets(path_to_stylesheet, qwidget):
     qwidget.setStyleSheet(stylesheet)
     return stylesheet
 
-# class ExecuteCommands:
-
-#     def execute_command_from_text(text, execute_path, stdin=None):
-#         """Executes command given from text and returns cmd's output."""
-#         output = ''
-#         commands = shlex.split(text)
-#         print(commands)
-#         print(execute_path)
-#         # commands = text
-
-#         if stdin is not None:
-#             output = subprocess.Popen(commands, stdin=stdin.stdout, 
-#                 stdout=subprocess.PIPE, shell=True, cwd=execute_path)
-#         else:
-#             output = subprocess.Popen(commands, stdout=subprocess.PIPE, 
-#                 shell=True, cwd=execute_path)
-
-#         return output
-    
-#     def execute_all_commands(*command_boxes):
-#         # finished = Signal()
-#         # progress = Signal(int)
-
-#         last_output = None
-#         for i, (command_box_value, path_box_value) in \
-#             enumerate(command_boxes):
-
-#             if last_output is not None:
-#                 # Below line is commented, because of I/O error
-#                 # All scripts/commands are executed just in order, their
-#                 # inputs aren't related or anything
-#                 # last_output = self.execute_command_from_text(
-#                 #     command_box.input_text, path_box.input_text,
-#                 #     last_output)
-#                 last_output = ExecuteCommands.execute_command_from_text(
-#                     command_box_value, path_box_value
-#                 )
-#             else:
-#                 last_output = ExecuteCommands.execute_command_from_text(
-#                     command_box_value, path_box_value)
-
-#             print(last_output.communicate()[0].decode())
-#         #     progress.emit(i + 1)
-
-#         # finished.emit()
-
 class ExecuteCommandsOneAfterAnother(QObject):
     command_num = Signal(int)
     finished = Signal()
@@ -113,8 +67,8 @@ class ExecuteCommandsOneAfterAnother(QObject):
 
 class ExecuteCommandsAllAtOnce(QObject):
     process_ready = Signal(object, int)
-    loaded = Signal()
     process_ended = Signal(int)
+    finished = Signal()
 
     def __init__(self, command_boxes_values, parent):
         super().__init__()
@@ -136,8 +90,6 @@ class ExecuteCommandsAllAtOnce(QObject):
 
             self.process_ready.emit(process, i)
 
-        self.loaded.emit()
-
         while any(self.processes):
             for i, process in enumerate(self.processes):
                 if process is not None:
@@ -146,3 +98,5 @@ class ExecuteCommandsAllAtOnce(QObject):
                         self.process_ended.emit(i)
                         self.processes[i] = None
             sleep(0.1)
+
+        self.finished.emit()

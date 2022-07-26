@@ -7,24 +7,35 @@ from PySide6.QtGui import (
     QPainter, QPalette, QImage, QPen
 )
 from utils.functions import read_stylesheets
+from components.content import ExecuteCommand, ScheduleCommand, Settings
 
 class Menu(QWidget):
+    """Menu panel (on the left side of the app)"""
     
-    def __init__(self):
+    def __init__(self, content_widget):
         super().__init__()
         self.setObjectName('menu_object')
         self.setFixedSize(300, 600)
         self.setAttribute(Qt.WA_StyledBackground)
+        self.content_widget = content_widget
         self.layout = QVBoxLayout(self)
 
-        menu_item_1 = MenuItem(text='Item 1', icon='assets/icons/exit.svg',
-            pressed_function=self.button_press_1)
+        insert_command = ExecuteCommand()
+        menu_item_1 = MenuItem(text='Execute command', 
+            icon='assets/icons/keyboard.svg',
+            pressed_function=lambda: self.change_apps_content(insert_command))
         self.layout.addWidget(menu_item_1)
-        menu_item_2 = MenuItem(text='Item 2', icon='assets/icons/app_icon.png',
-            pressed_function=self.button_press_1)
+
+        schedule_command = ScheduleCommand()
+        menu_item_2 = MenuItem(text='Schedule command', 
+            icon='assets/icons/schedule.svg',
+            pressed_function=lambda: self.change_apps_content(schedule_command))
         self.layout.addWidget(menu_item_2)
-        menu_item_3 = MenuItem(text='Item 2', icon='assets/icons/app_icon.png',
-            pressed_function=self.button_press_1)
+
+        settings = Settings()
+        menu_item_3 = MenuItem(text='Settings', 
+            icon='assets/icons/settings.svg',
+            pressed_function=lambda: self.change_apps_content(settings))
         self.layout.addWidget(menu_item_3)
 
         self.layout.setContentsMargins(0, 0, 0, 0)
@@ -32,8 +43,8 @@ class Menu(QWidget):
         self.setLayout(self.layout)
         read_stylesheets('styles/menu.qss', self)
 
-    def button_press_1(self):
-        print('button pressed')
+    def change_apps_content(self, content):
+        self.content_widget.change_content(content)
 
 class MenuItem(QWidget):
 
@@ -56,6 +67,6 @@ class MenuItem(QWidget):
     def paintEvent(self, event: QPaintEvent):
         painter = QPainter(self)
         
-        painter.drawText(50, 31, self.text)
-        painter.drawPixmap(5, 5, 40, 40, QIcon(self.icon).pixmap(40, 40))
+        painter.drawText(60, 31, self.text)
+        painter.drawPixmap(10, 5, 40, 40, QIcon(self.icon).pixmap(40, 40))
         painter.end()

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QGridLayout
+from PySide6.QtWidgets import QWidget, QGridLayout, QLabel
 from PySide6.QtCore import Qt, QThread, Slot
 from utils.functions import (
     read_stylesheets, ExecuteCommandsOneAfterAnother,
@@ -15,11 +15,8 @@ import signal
 from functools import partial
 import threading
 
-def test(num):
-    sleep(1)
-    print(f'slept {num}')
-
 class Content(QWidget):
+    """App's content (center part of the app's GUI)"""
     
     def __init__(self):
         super().__init__()
@@ -28,15 +25,31 @@ class Content(QWidget):
         self.setFixedSize(700, 550)
         read_stylesheets('styles/content.qss', self)
 
-        layout = QGridLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        self.layout = QGridLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
 
-        insert_command = InsertCommand()
-        layout.addWidget(insert_command)
+        self.current_content = ExecuteCommand()
+        self.layout.addWidget(self.current_content)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
 
-class InsertCommand(QWidget):
+    def change_content(self, content):
+        if self.layout.count() > 0:
+            self.layout.itemAt(0).widget().setParent(None)
+            self.current_content = content
+            self.layout.addWidget(self.current_content)
+        # self.layout.removeWidget(self.current_content)
+        # self.current_content.deleteLater()
+        # self.current_content = content
+        # self.layout.addWidget(self.current_content)
+
+class ExecuteCommand(QWidget):
+    """
+    Executes command (or commands if there is added more) in one of the two
+    modes:
+    - execute all commands at once
+    - execute commands one after another
+    """
 
     def __init__(self):
         super().__init__()
@@ -79,40 +92,6 @@ class InsertCommand(QWidget):
             command_boxes_values.append(
                 [command_box.input_text, path_box.input_text])
 
-        # def execute_all_at_once():
-        #     buttons = []
-
-        #     def cancel_process(process, button_widget_pos):
-        #         # Problems when process is another pyQt application - it
-        #         # terminates app, but throws error/warning "Timers cannot
-        #         # be stopped from another thread"
-        #         process.terminate()
-        #         process.send_signal(signal.CTRL_BREAK_EVENT)
-        #         self.layout.removeWidget(buttons[button_widget_pos])
-        #         buttons[button_widget_pos].deleteLater()
-        #         buttons[button_widget_pos] = None
-
-        #     for i, (command_box_value, path_box_value) in \
-        #         enumerate(command_boxes_values):
-
-        #         process = subprocess.Popen(command_box_value, 
-        #             # stdin=subprocess.PIPE,
-        #             stdout=subprocess.PIPE, shell=True, 
-        #             creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
-        #             cwd=path_box_value)
-
-        #         sleep(0.1)
-
-        #         cancel_executing_button = Button(width=50, height=50, icon_width=50,
-        #             icon_height=50, icon_url='assets/icons/exit.svg',
-        #             object_name='cancel_executing_button',
-        #             clicked_function=partial(
-        #                 lambda process, i: cancel_process(process, i),
-        #                 process=process, i=i))
-
-        #         self.layout.addWidget(cancel_executing_button, i + 1, 2, 1, 1)
-        #         buttons.append(cancel_executing_button)
-
         def execute_all_at_once():
             self.buttons = []
 
@@ -146,6 +125,8 @@ class InsertCommand(QWidget):
                     self.buttons[process_pos].deleteLater()
                     self.buttons[process_pos] = None
 
+            self.execute_button.setEnabled(False)
+
             self.execute_commands = ExecuteCommandsAllAtOnce(
                 command_boxes_values, self)
             self.thread = QThread(self)
@@ -155,6 +136,8 @@ class InsertCommand(QWidget):
             self.execute_commands.process_ready.connect(initialize_button)
             self.execute_commands.process_ended.connect(remove_button)
 
+            self.execute_commands.finished.connect(self.thread.quit)
+            self.thread.finished.connect(lambda: self.execute_button.setEnabled(True))
             self.thread.finished.connect(self.execute_commands.deleteLater)
             self.thread.finished.connect(self.thread.deleteLater)
 
@@ -212,3 +195,34 @@ class InsertCommand(QWidget):
 
     def change_execution_mode(self):
         self.execute_all_at_once = not self.execute_all_at_once
+
+class ScheduleCommand(QWidget):
+
+    def __init__(self):
+        super().__init__()
+        
+        self.setObjectName('schedule_command')
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.layout = QGridLayout(self)
+
+        execute_button = Button(width=200, height=50, text='Execute', 
+            object_name='execute_button')
+        self.layout.addWidget(execute_button, 0, 0, 1, 1)
+
+        self.setLayout(self.layout)
+
+        # now try to implement ScheduleCommand class
+
+class Settings(QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        self.setObjectName('settings')
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.layout = QGridLayout(self)
+
+        label = QLabel('Settings soon...')
+        self.layout.addWidget(label, 0, 0, 1, 1)
+
+        self.setLayout(self.layout)

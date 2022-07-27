@@ -64,3 +64,19 @@ QCheckBox#check_box::indicator::checked {
     width: 48px;
     height: 48px;
 }
+
+QDateTimeEdit#date_time_input_box {
+    background-color: @primary;
+    color: @text;
+    font-size: 16px;
+    border-width: 0 0 1px 0;
+    border-color: @text_darker;
+    border-style: solid;
+}
+
+QDateTimeEdit::drop-down {
+    image: url('assets/icons/edit_calendar.svg');
+    width: 32px;
+    height: 32px;
+    subcontrol-position: right center;
+}

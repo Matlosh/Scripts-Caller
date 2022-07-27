@@ -6,13 +6,14 @@ from PySide6.QtWidgets import (
     QApplication, QWidget, QMainWindow, QLabel, QVBoxLayout, QMenuBar,
     QToolBar, QDockWidget, QSystemTrayIcon, QMenu, QHBoxLayout, QGridLayout
 )
-from PySide6.QtCore import Slot, Qt
+from PySide6.QtCore import Slot, Qt, QThread
 from PySide6.QtGui import QIcon, QAction
 from config import config
 from components.application_topbar import ApplicationTopBar
 from components.menu import Menu
 from components.content import Content
-from utils.functions import read_stylesheets
+from utils.functions import read_stylesheets, ExecuteScheduledCommands
+from data.shared_data import SharedData
 
 class ScriptsCaller(QMainWindow):
 
@@ -23,11 +24,13 @@ class ScriptsCaller(QMainWindow):
         self.setWindowTitle('Scripts Caller')
         self.setWindowFlag(Qt.FramelessWindowHint, True)
         # self.setWindowFlag(Qt.WindowStaysOnTopHint)
-        # self.setWindowFlag(Qt.Tool, True)
+        self.setWindowFlag(Qt.Tool, True)
 
         # Config settings
         self.resize(config['window_width'], config['window_height'])
         self.setFixedSize(config['window_width'], config['window_height'])
+
+        self.shared_data = SharedData()
 
     def start(self):
         """Starts the application UI."""
@@ -41,6 +44,23 @@ class ScriptsCaller(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
 
+        # Turns on scripts scheduler
+        self.execute_scheduled_commands = ExecuteScheduledCommands()
+        self.thread = QThread(self)
+        self.execute_scheduled_commands.moveToThread(self.thread)
+
+        self.thread.started.connect(
+            self.execute_scheduled_commands.check_and_execute)
+
+        # repair QThread error/warning here
+
+        self.thread.finished.connect(
+            self.execute_scheduled_commands.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.thread.finished.connect(lambda: print('finished'))
+
+        self.thread.start()
+
         # menu_n_content_layout = QGridLayout()
         # main_layout.addLayout(menu_n_content_layout)
         main_layout.setSpacing(0)
@@ -50,7 +70,8 @@ class ScriptsCaller(QMainWindow):
         main_layout.addWidget(content, 1, 1, 1, 3)
 
         # Application Menu
-        menu = Menu(content)
+        menu = Menu(content, self.shared_data,
+            self.execute_scheduled_commands)
         main_layout.addWidget(menu, 1, 0)
 
         # menu_n_content_layout.setColumnStretch(1, 1)

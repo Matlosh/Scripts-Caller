@@ -6,7 +6,7 @@ QWidget#insert_command {
 
 }
 
-QPushButton#execute_button {
+QPushButton#execute_button, QPushButton#add_to_schedule_button {
     background-color: #BC00FF;
     border-radius: 8px;
     /* margin-left: 10px; */
@@ -14,7 +14,7 @@ QPushButton#execute_button {
     padding: 10px 0 10px 0;
 }
 
-QPushButton#execute_button:hover {
+QPushButton#execute_button:hover, QPushButton#add_to_schedule_button:hover {
     background-color: #AD20DF;
 }
 

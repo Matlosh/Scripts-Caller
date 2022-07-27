@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import (
     QWidget, QAbstractButton, QVBoxLayout, QPushButton, QLabel,
-    QLineEdit, QCheckBox
+    QLineEdit, QCheckBox, QDateTimeEdit
 )
-from PySide6.QtCore import Qt, QSize, QRect
+from PySide6.QtCore import Qt, QSize, QRect, QDateTime
 from PySide6.QtGui import QIcon, QCursor, QPainter, QMouseEvent
 from utils import functions
 
@@ -73,3 +73,23 @@ class CheckBox(QCheckBox):
         self.setText(text)
         self.setCursor(QCursor(Qt.PointingHandCursor))
         functions.read_stylesheets('styles/reusable.qss', self)
+
+class DateTimeInputBox(QDateTimeEdit):
+    
+    def __init__(self, *, width, height, object_name='date_time_input_box', 
+        start_date=QDateTime.currentDateTime(), show_calendar_popup=True,
+        display_format='dd/MM/yyyy HH:mm:ss'):
+        super().__init__()
+
+        self.date_time = start_date
+
+        self.setObjectName(object_name)
+        self.setFixedSize(width, height)
+        self.setDateTime(start_date)
+        self.setCalendarPopup(show_calendar_popup)
+        self.setDisplayFormat(display_format)
+        functions.read_stylesheets('styles/reusable.qss', self)
+        self.dateTimeChanged.connect(self.date_time_changed)
+
+    def date_time_changed(self, date_time):
+        self.date_time = date_time

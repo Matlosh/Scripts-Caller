@@ -6,6 +6,7 @@ import signal
 import subprocess
 from components.reusable import Button
 from functools import partial
+import time
 
 def read_stylesheets(path_to_stylesheet, qwidget):
     """Reads stylesheet and sets in on the passed widget."""
@@ -43,6 +44,14 @@ def read_stylesheets(path_to_stylesheet, qwidget):
     return stylesheet
 
 class ExecuteCommandsOneAfterAnother(QObject):
+    """
+    Executes given command boxes one after another.
+    
+    Contains signals:
+    - command_num - signal emitted every change of executed command, returns
+        position of the currently executed command box in given command boxes 
+        list
+    - finished - signal emitted when all commands are executed"""
     command_num = Signal(int)
     finished = Signal()
 
@@ -66,13 +75,23 @@ class ExecuteCommandsOneAfterAnother(QObject):
         self.finished.emit()
 
 class ExecuteCommandsAllAtOnce(QObject):
+    """
+    Executes all given commands at once.
+    
+    Contains signals:
+    - process_ready - signal emitted when process was fired and is ready 
+        "to work", returns fired process and it's position in the given 
+        command boxes list
+    - process_ended - signal emitted when one of the given processes has 
+        ended, returns position of that process
+    - finished - signal emitted when all of the processes have ended
+    """
     process_ready = Signal(object, int)
     process_ended = Signal(int)
     finished = Signal()
 
-    def __init__(self, command_boxes_values, parent):
+    def __init__(self, command_boxes_values):
         super().__init__()
-        self.parent = parent
         self.command_boxes_values = command_boxes_values
         self.processes = []
 
@@ -100,3 +119,32 @@ class ExecuteCommandsAllAtOnce(QObject):
             sleep(0.1)
 
         self.finished.emit()
+
+class ExecuteScheduledCommands(QObject):
+    """
+    Checks if any of the expected execute time for command has passed and -
+        if yes - executes that command.
+    Note: It is recommended to create an object of this class only once and
+        just update its scheduled commands list in order to prevent from
+        executing the same scheduled commands few times
+
+    scheduled_commands pattern:
+        - at index 0 - planned date and time to execute command (as QDateTime)
+        - at index 1 - command to execute (as str)
+        - at index 2 - path to execute command at (as str)
+    """
+
+    def __init__(self, scheduled_commands=[]):
+        super().__init__()
+        self.scheduled_commands = scheduled_commands
+
+    def check_and_execute(self):
+        while True:
+            for scheduled_command in self.scheduled_commands:
+                current_time = int(time.time())
+                if current_time == scheduled_command[0].toSecsSinceEpoch():
+                    process = subprocess.Popen(scheduled_command[1],
+                        stdout=subprocess.PIPE, shell=True,
+                        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+                        cwd=scheduled_command[2])
+            sleep(1)

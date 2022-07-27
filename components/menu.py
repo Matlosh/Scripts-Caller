@@ -7,17 +7,22 @@ from PySide6.QtGui import (
     QPainter, QPalette, QImage, QPen
 )
 from utils.functions import read_stylesheets
-from components.content import ExecuteCommand, ScheduleCommand, Settings
+from components.content import (
+    ExecuteCommand, ScheduleCommand, ScheduledCommandsList, Settings
+)
 
 class Menu(QWidget):
     """Menu panel (on the left side of the app)"""
     
-    def __init__(self, content_widget):
+    def __init__(self, content_widget, shared_data, execute_scheduled_commands):
         super().__init__()
         self.setObjectName('menu_object')
         self.setFixedSize(300, 600)
         self.setAttribute(Qt.WA_StyledBackground)
+
+        self.shared_data = shared_data
         self.content_widget = content_widget
+        self.execute_scheduled_commands = execute_scheduled_commands
         self.layout = QVBoxLayout(self)
 
         insert_command = ExecuteCommand()
@@ -26,22 +31,33 @@ class Menu(QWidget):
             pressed_function=lambda: self.change_apps_content(insert_command))
         self.layout.addWidget(menu_item_1)
 
-        schedule_command = ScheduleCommand()
+        schedule_command = ScheduleCommand(self.shared_data, 
+            self.execute_scheduled_commands)
         menu_item_2 = MenuItem(text='Schedule command', 
             icon='assets/icons/schedule.svg',
             pressed_function=lambda: self.change_apps_content(schedule_command))
         self.layout.addWidget(menu_item_2)
 
+        scheduled_commands_list = ScheduledCommandsList()
+        menu_item_3 = MenuItem(text='Scheduled commands list',
+            icon='assets/icons/schedule.svg',
+            pressed_function=lambda: self.change_apps_content(
+                scheduled_commands_list))
+        self.layout.addWidget(menu_item_3)
+
         settings = Settings()
-        menu_item_3 = MenuItem(text='Settings', 
+        menu_item_4 = MenuItem(text='Settings', 
             icon='assets/icons/settings.svg',
             pressed_function=lambda: self.change_apps_content(settings))
-        self.layout.addWidget(menu_item_3)
+        self.layout.addWidget(menu_item_4)
 
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.layout.setAlignment(Qt.AlignTop)
         self.setLayout(self.layout)
         read_stylesheets('styles/menu.qss', self)
+
+        # Setting default loaded content
+        self.change_apps_content(schedule_command)
 
     def change_apps_content(self, content):
         self.content_widget.change_content(content)

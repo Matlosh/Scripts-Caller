@@ -1,10 +1,10 @@
-from PySide6.QtWidgets import QWidget, QGridLayout, QLabel
-from PySide6.QtCore import Qt, QThread, Slot
+from PySide6.QtWidgets import QWidget, QGridLayout, QLabel, QDateTimeEdit
+from PySide6.QtCore import Qt, QThread, Slot, QDateTime
 from utils.functions import (
-    read_stylesheets, ExecuteCommandsOneAfterAnother,
+    ExecuteScheduledCommands, read_stylesheets, ExecuteCommandsOneAfterAnother,
     ExecuteCommandsAllAtOnce
 )
-from components.reusable import Button, InputBox, CheckBox
+from components.reusable import Button, InputBox, CheckBox, DateTimeInputBox
 import subprocess
 import shlex
 import pathlib
@@ -28,16 +28,14 @@ class Content(QWidget):
         self.layout = QGridLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
 
-        self.current_content = ExecuteCommand()
-        self.layout.addWidget(self.current_content)
-
         self.setLayout(self.layout)
 
     def change_content(self, content):
         if self.layout.count() > 0:
             self.layout.itemAt(0).widget().setParent(None)
-            self.current_content = content
-            self.layout.addWidget(self.current_content)
+            
+        self.current_content = content
+        self.layout.addWidget(self.current_content)
         # self.layout.removeWidget(self.current_content)
         # self.current_content.deleteLater()
         # self.current_content = content
@@ -74,7 +72,8 @@ class ExecuteCommand(QWidget):
             icon_height=50, icon_url='assets/icons/plus.svg',
             object_name='add_box_button', 
             clicked_function=self.add_command_row)
-        self.execute_at_one_checkbox = CheckBox(width=200, height=50, text='Execute all at once')
+        self.execute_at_one_checkbox = CheckBox(width=200, height=50, 
+            text='Execute all at once')
 
         self.layout.addWidget(self.execute_at_one_checkbox, 0, 0, 1, 1)
         self.layout.addWidget(self.execute_button, 0, 1, 1, 1)
@@ -128,7 +127,7 @@ class ExecuteCommand(QWidget):
             self.execute_button.setEnabled(False)
 
             self.execute_commands = ExecuteCommandsAllAtOnce(
-                command_boxes_values, self)
+                command_boxes_values)
             self.thread = QThread(self)
             self.execute_commands.moveToThread(self.thread)
 
@@ -198,20 +197,86 @@ class ExecuteCommand(QWidget):
 
 class ScheduleCommand(QWidget):
 
-    def __init__(self):
+    def __init__(self, shared_data, execute_scheduled_commands):
         super().__init__()
+
+        self.shared_data = shared_data
+        self.execute_scheduled_commands = execute_scheduled_commands
+        self.DEFAULT_SCRIPT_DIR_PATH = pathlib.Path('..').parent \
+            .absolute().__str__()
         
         self.setObjectName('schedule_command')
         self.setAttribute(Qt.WA_StyledBackground)
         self.layout = QGridLayout(self)
+        self.layout.setAlignment(Qt.AlignCenter)
 
-        execute_button = Button(width=200, height=50, text='Execute', 
-            object_name='execute_button')
-        self.layout.addWidget(execute_button, 0, 0, 1, 1)
+        self.schedule_boxes = []
+
+        add_to_schedule_button = Button(width=200, height=50,
+            text='Add to schedule',
+            object_name='add_to_schedule_button',
+            clicked_function=self.add_command_to_schedule)
+        add_box_button = Button(width=50, height=50, icon_width=50,
+            icon_height=50, icon_url='assets/icons/plus.svg',
+            object_name='add_box_button',
+            clicked_function=self.add_schedule_box)        
+
+        # now add other compoenents to adding the new command to the schedule
+        # trying to schedule and then save/load on program open/close
+
+        self.layout.addWidget(add_to_schedule_button, 0, 1, 1, 1)
+        self.layout.addWidget(add_box_button, 0, 2, 1, 1)
+
+        self.add_schedule_box()
 
         self.setLayout(self.layout)
 
-        # now try to implement ScheduleCommand class
+    def add_schedule_box(self):
+        schedule_date_time = DateTimeInputBox(width=200, height=50)
+        command_box = InputBox(width=300, height=50,
+            placeholder='Command to schedule...', object_name='input_box')
+        path_box = InputBox(width=200, height=50, value=self.DEFAULT_SCRIPT_DIR_PATH)
+
+        self.schedule_boxes.append([schedule_date_time, command_box, path_box])
+        schedule_boxes_len = len(self.schedule_boxes)
+
+        self.layout.addWidget(schedule_date_time, 2 * schedule_boxes_len - 1, 
+            0, 1, 1)
+        self.layout.addWidget(command_box, 2 * schedule_boxes_len, 0, 1, 1)
+        self.layout.addWidget(path_box, 2 * schedule_boxes_len, 1, 1, 1)
+
+    def add_command_to_schedule(self):
+        # below code is pretty ugly
+        for schedule_date_time, command_box, path_box in self.schedule_boxes:
+            schedule_box = [
+                schedule_date_time.date_time,
+                command_box.input_text,
+                path_box.input_text    
+            ]
+            self.shared_data.scheduled_commands.append(schedule_box)
+            self.execute_scheduled_commands.scheduled_commands \
+                .append(schedule_box)
+            self.layout.removeWidget(schedule_date_time)
+            self.layout.removeWidget(command_box)
+            self.layout.removeWidget(path_box)
+            schedule_date_time.deleteLater()
+            command_box.deleteLater()
+            path_box.deleteLater()
+
+        self.schedule_boxes.clear()
+        self.add_schedule_box()
+
+class ScheduledCommandsList(QWidget):
+
+    def __init__(self):
+        super().__init__()
+
+        self.layout = QGridLayout(self)
+
+        label = QLabel(self.__class__.__name__)
+        self.layout.addWidget(label)
+
+        self.setLayout(self.layout)
 
 class Settings(QWidget):
 

@@ -1,5 +1,10 @@
-from PySide6.QtWidgets import QWidget, QGridLayout, QLabel, QDateTimeEdit
+from PySide6.QtWidgets import (
+    QWidget, QGridLayout, QLabel, QDateTimeEdit, QHBoxLayout, QScrollArea,
+    QScrollBar
+)
 from PySide6.QtCore import Qt, QThread, Slot, QDateTime
+from PySide6.QtGui import QPalette
+from data.shared_data import SharedData
 from utils.functions import (
     ExecuteScheduledCommands, read_stylesheets, ExecuteCommandsOneAfterAnother,
     ExecuteCommandsAllAtOnce
@@ -10,7 +15,7 @@ import shlex
 import pathlib
 import os
 from multiprocessing import Process
-from time import sleep
+from time import sleep, time
 import signal
 from functools import partial
 import threading
@@ -266,17 +271,80 @@ class ScheduleCommand(QWidget):
         self.schedule_boxes.clear()
         self.add_schedule_box()
 
-class ScheduledCommandsList(QWidget):
+class ScheduledCommandsList(QScrollArea):
 
-    def __init__(self):
+    def __init__(self, shared_data: SharedData):
         super().__init__()
 
-        self.layout = QGridLayout(self)
+        self.setObjectName('scheduled_commands_list')
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setFixedSize(700, 550)
+        self.setMinimumSize(700, 0)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
 
-        label = QLabel(self.__class__.__name__)
-        self.layout.addWidget(label)
+        self.content = QWidget(self)
+        self.layout = QGridLayout(self)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.shared_data = shared_data
+
+        self.reload_list()
+
+        self.layout.setAlignment(Qt.AlignTop)
+        self.content.setLayout(self.layout)
+        self.setWidget(self.content)
+        self.setAlignment(Qt.AlignTop)
+
+        read_stylesheets('styles/content.qss', self)
+
+    def reload_list(self):
+        if self.layout.count() > 0:
+            for i in range(self.layout.count()):
+                self.layout.itemAt(i).widget().deleteLater()
+                self.content.setMinimumHeight(0)
+
+        for i, scheduled_command in enumerate(
+            sorted(self.shared_data.scheduled_commands)):
+            item = ScheduledCommandsListItem(
+                width=700,
+                height=50,
+                date=scheduled_command[0],
+                command=scheduled_command[1], 
+                path=scheduled_command[2]
+            )
+
+            self.layout.addWidget(item, i, 0, 1, 1)
+            self.content.setMinimumSize(700, self.content.minimumHeight() + 60)
+
+class ScheduledCommandsListItem(QWidget):
+
+    def __init__(self, *, width, height, date: QDateTime, command, path):
+        super().__init__()
+
+        object_name = 'scheduled_commands_list_item'
+
+        if date.toSecsSinceEpoch() <= int(time()):
+            object_name += '_fired'
+        else:
+            object_name += '_waiting'
+
+        self.setObjectName(object_name)
+        self.setAttribute(Qt.WA_StyledBackground)
+        self.setFixedSize(width, height)
+        self.setMinimumSize(width, height)
+        self.layout = QHBoxLayout(self)
+        self.layout.setAlignment(Qt.AlignCenter)
+
+        command_label = QLabel(command)
+        path_label = QLabel(path)
+        date_label = QLabel(date.toString('dd/MM/yyyy HH:mm:ss'))
+
+        self.layout.addWidget(command_label)
+        self.layout.addWidget(path_label)
+        self.layout.addWidget(date_label)
 
         self.setLayout(self.layout)
+        read_stylesheets('styles/content.qss', self)
 
 class Settings(QWidget):
 

@@ -6,14 +6,16 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QIcon, QCursor, QMouseEvent
 from utils.functions import read_stylesheets
 from components.reusable import Button
+from data.shared_data import SharedData
 
 class ApplicationTopBar(QWidget):
     """Widget which contains exit and minimize button."""
 
-    def __init__(self, parent_window: QWidget):
+    def __init__(self, parent_window: QWidget, shared_data: SharedData):
         super().__init__()
         self.parent_window = parent_window
         self.drag_mouse_pos = ''
+        self.shared_data = shared_data
         self.setObjectName('application_topbar')
         self.setAttribute(Qt.WA_StyledBackground)
         self.startUI()
@@ -43,6 +45,7 @@ class ApplicationTopBar(QWidget):
         # now repair app's movement error when move=nig after clicking on topbar's button
 
     def close_application(self):
+        self.shared_data.save_to_file()
         QApplication.exit()
 
     def minimize_application(self):

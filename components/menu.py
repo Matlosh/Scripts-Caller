@@ -33,14 +33,14 @@ class Menu(QWidget):
 
         schedule_command = ScheduleCommand(self.shared_data, 
             self.execute_scheduled_commands)
-        menu_item_2 = MenuItem(text='Schedule command', 
+        menu_item_2 = MenuItem(text='Schedule command',
             icon='assets/icons/schedule.svg',
             pressed_function=lambda: self.change_apps_content(schedule_command))
         self.layout.addWidget(menu_item_2)
 
-        scheduled_commands_list = ScheduledCommandsList()
+        scheduled_commands_list = ScheduledCommandsList(self.shared_data)
         menu_item_3 = MenuItem(text='Scheduled commands list',
-            icon='assets/icons/schedule.svg',
+            icon='assets/icons/list.svg',
             pressed_function=lambda: self.change_apps_content(
                 scheduled_commands_list))
         self.layout.addWidget(menu_item_3)
@@ -60,7 +60,20 @@ class Menu(QWidget):
         self.change_apps_content(schedule_command)
 
     def change_apps_content(self, content):
+        if isinstance(content, ScheduledCommandsList):
+            content.reload_list()
         self.content_widget.change_content(content)
+
+    # now try to synchronize shared_data with other
+
+    # @property
+    # def shared_data(self):
+    #     return self._shared_data
+
+    # @shared_data.setter
+    # def shared_data(self, new_shared_data):
+    #     print('value changed')
+    #     self._shared_data = new_shared_data
 
 class MenuItem(QWidget):
 

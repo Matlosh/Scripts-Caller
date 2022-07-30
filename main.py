@@ -37,7 +37,8 @@ class ScriptsCaller(QMainWindow):
         main_layout = QGridLayout()
 
         # Application Topbar (with exit, minimize button)
-        application_topbar = ApplicationTopBar(parent_window=self)
+        application_topbar = ApplicationTopBar(parent_window=self, 
+            shared_data=self.shared_data)
         main_layout.addWidget(application_topbar, 0, 0)
 
         self.central_widget.setLayout(main_layout)
@@ -45,7 +46,8 @@ class ScriptsCaller(QMainWindow):
         self.centralWidget().layout().setContentsMargins(0, 0, 0, 0)
 
         # Turns on scripts scheduler
-        self.execute_scheduled_commands = ExecuteScheduledCommands()
+        self.execute_scheduled_commands = ExecuteScheduledCommands(
+            scheduled_commands=self.shared_data.scheduled_commands)
         self.thread = QThread(self)
         self.execute_scheduled_commands.moveToThread(self.thread)
 

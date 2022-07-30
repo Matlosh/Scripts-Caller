@@ -31,3 +31,47 @@ QPushButton#cancel_executing_button {
 QPushButton#cancel_executing_button:hover {
     background-color: @special_2_darker;
 }
+
+#scheduled_commands_list {
+    background-color: transparent;
+    border: 0;
+}
+
+#scheduled_commands_list QWidget {
+    background-color: transparent;
+}
+
+#scheduled_commands_list QScrollBar:vertical {
+    background: white;
+    width: 5px;
+}
+
+#scheduled_commands_list QScrollBar::handle:vertical {
+    background: @primary_darker;
+    width: 5px;
+}
+
+#scheduled_commands_list QScrollBar:left-arrow:vertical, #scheduled_commands_list QScrollBar:right-arrow:vertical {
+    border: 2px solid gray;
+    width: 3px;
+    height: 3px;
+    background: white;
+}
+
+QWidget#scheduled_commands_list_item_fired {
+    border-style: solid;
+    border-width: 0 0 0 5px;
+    border-color: red;
+}
+
+QWidget#scheduled_commands_list_item_waiting {
+    border-style: solid;
+    border-width: 0 0 0 5px;
+    border-color: green;
+}
+
+QWidget#scheduled_commands_list_item_fired > QLabel, 
+QWidget#scheduled_commands_list_item_waiting > QLabel {
+    color: @text;
+    font-size: 10px;
+}

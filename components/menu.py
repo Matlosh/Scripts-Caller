@@ -45,7 +45,7 @@ class Menu(QWidget):
                 scheduled_commands_list))
         self.layout.addWidget(menu_item_3)
 
-        settings = Settings()
+        settings = Settings(self.shared_data)
         menu_item_4 = MenuItem(text='Settings', 
             icon='assets/icons/settings.svg',
             pressed_function=lambda: self.change_apps_content(settings))

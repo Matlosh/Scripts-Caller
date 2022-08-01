@@ -6,7 +6,8 @@ QWidget#insert_command {
 
 }
 
-QPushButton#execute_button, QPushButton#add_to_schedule_button {
+QPushButton#execute_button, QPushButton#add_to_schedule_button, 
+QPushButton#save_button, QPushButton#clear_shared_data_button {
     background-color: #BC00FF;
     border-radius: 8px;
     /* margin-left: 10px; */
@@ -14,7 +15,8 @@ QPushButton#execute_button, QPushButton#add_to_schedule_button {
     padding: 10px 0 10px 0;
 }
 
-QPushButton#execute_button:hover, QPushButton#add_to_schedule_button:hover {
+QPushButton#execute_button:hover, QPushButton#add_to_schedule_button:hover,
+QPushButton#save_button:hover {
     background-color: #AD20DF;
 }
 
@@ -74,4 +76,25 @@ QWidget#scheduled_commands_list_item_fired > QLabel,
 QWidget#scheduled_commands_list_item_waiting > QLabel {
     color: @text;
     font-size: 10px;
+}
+
+QWidget#settings {
+
+}
+
+QWidget#settings > QLabel {
+    font-size: 16px;
+    color: @text;
+}
+
+QWidget#settings > QPushButton#save_button {
+    margin: 0 0 0 10px;
+}
+
+QWidget#settings > QPushButton#clear_shared_data_button {
+    background-color: @special_2;
+}
+
+QWidget#settings > QPushButton#clear_shared_data_button:hover {
+    background-color: @special_2_darker;
 }

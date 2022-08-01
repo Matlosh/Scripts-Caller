@@ -1,10 +1,9 @@
-import pickle, os
+import pickle, os, copy
 
 class SharedData:
 
     def __init__(self):
         self.scheduled_commands = []
-        self.some_test = []
 
         # Searches for any saved variables and saves them if any were found
         self.read_from_file()
@@ -20,15 +19,27 @@ class SharedData:
         Reads data from the file and saves it to the object's
         variables, if succeeds."""
         if os.path.exists('data/data.bin'):
-            initial_variables = self.__dict__
+            try:
+                initial_variables = self.__dict__
 
-            saved_variables = {}
-            with open('data/data.bin', 'rb') as file:
-                saved_variables_bytes = file.read()
-                saved_variables = pickle.loads(saved_variables_bytes)
+                saved_variables = {}
+                with open('data/data.bin', 'rb') as file:
+                    saved_variables_bytes = file.read()
+                    saved_variables = pickle.loads(saved_variables_bytes)
 
-            for name, value in initial_variables.items():
-                if name not in saved_variables:
-                    saved_variables[name] = value
+                for name, value in initial_variables.items():
+                    if name not in saved_variables:
+                        saved_variables[name] = value
 
-            self.__dict__ = saved_variables
+                self.__dict__ = saved_variables
+            except:
+                pass
+
+    def clear_shared_data(self):
+        """Removes data file (if exists) and sets currently opereated data
+        to the initial state."""
+        if os.path.exists('data/data.bin'):
+            os.remove('data/data.bin')
+        
+        self.__dict__ = {}
+        self.__init__()

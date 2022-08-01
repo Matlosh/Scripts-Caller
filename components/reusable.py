@@ -93,3 +93,22 @@ class DateTimeInputBox(QDateTimeEdit):
 
     def date_time_changed(self, date_time):
         self.date_time = date_time
+
+class TextHeader(QLabel):
+
+    def __init__(self, *, text='', object_name='text_header'):
+        super().__init__()
+
+        self.setObjectName(object_name)
+        self.setText(text.upper())
+        self.setAlignment(Qt.AlignCenter)
+
+        functions.read_stylesheets('styles/reusable.qss', self)
+
+class EmptySpace(QWidget):
+
+    def __init__(self, *, width, height, object_name='empty_space'):
+        super().__init__()
+
+        self.setObjectName(object_name)
+        self.setFixedSize(width, height)

@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QGridLayout, QLabel, QDateTimeEdit, QHBoxLayout, QScrollArea,
-    QScrollBar
+    QScrollBar, QDialog
 )
 from PySide6.QtCore import Qt, QThread, Slot, QDateTime
 from PySide6.QtGui import QPalette
@@ -9,7 +9,11 @@ from utils.functions import (
     ExecuteScheduledCommands, read_stylesheets, ExecuteCommandsOneAfterAnother,
     ExecuteCommandsAllAtOnce
 )
-from components.reusable import Button, InputBox, CheckBox, DateTimeInputBox
+from components.reusable import (
+    Button, InputBox, CheckBox, DateTimeInputBox, Label, TextHeader,
+    EmptySpace
+)
+from config import Config
 import subprocess
 import shlex
 import pathlib
@@ -19,6 +23,7 @@ from time import sleep, time
 import signal
 from functools import partial
 import threading
+import textwrap
 
 class Content(QWidget):
     """App's content (center part of the app's GUI)"""
@@ -302,6 +307,8 @@ class ScheduledCommandsList(QScrollArea):
             for i in range(self.layout.count()):
                 self.layout.itemAt(i).widget().deleteLater()
                 self.content.setMinimumHeight(0)
+        else:
+            self.content.setFixedSize(700, 0)
 
         for i, scheduled_command in enumerate(
             sorted(self.shared_data.scheduled_commands)):
@@ -328,6 +335,8 @@ class ScheduledCommandsListItem(QWidget):
         else:
             object_name += '_waiting'
 
+        # now create bar at the bottom with app's version
+
         self.setObjectName(object_name)
         self.setAttribute(Qt.WA_StyledBackground)
         self.setFixedSize(width, height)
@@ -348,14 +357,94 @@ class ScheduledCommandsListItem(QWidget):
 
 class Settings(QWidget):
 
-    def __init__(self):
+    def __init__(self, shared_data: SharedData):
         super().__init__()
 
         self.setObjectName('settings')
         self.setAttribute(Qt.WA_StyledBackground)
         self.layout = QGridLayout(self)
+        self.layout.setAlignment(Qt.AlignCenter)
 
-        label = QLabel('Settings soon...')
-        self.layout.addWidget(label, 0, 0, 1, 1)
+        self.config = Config()
+        self.shared_data = shared_data
+
+        self.TEXTS = {
+            'config_changed': "All changes will be available after app's reload.",
+            'shared_data_cleaned': 'Shared data was cleaned.'
+        }
+
+        self.variables_settings_inputs = [
+            ['window_width', 'Window width', InputBox, 
+                str(self.config.window_width)],
+            ['window_height', 'Window height', InputBox, 
+                str(self.config.window_height)]
+        ]
+
+        self.setup_UI()
+
+    def setup_UI(self):
+        self.values = {}
+
+        # variables header setup
+        header_variables = TextHeader(text='Variables')
+        self.layout.addWidget(header_variables, 0, 0, 1, 2)
+
+        # variables settings setup
+        for i, (config_name, label_value, value_box_type, default_value) \
+            in enumerate(self.variables_settings_inputs):
+            label = Label(width=300, height=50, text=label_value)
+            value_input = value_box_type(width=100, height=50,
+                value=default_value)
+
+            self.values[config_name] = value_input
+
+            self.layout.addWidget(label, self.layout.count(), 0, 1, 1)
+            self.layout.addWidget(value_input, self.layout.count() - 1, 1, 1, 1)
+
+        # empty space between "save button" and "values"
+        empty_space_1 = EmptySpace(width=400, height=10)
+        self.layout.addWidget(empty_space_1, self.layout.count(), 0, 1, 1)
+
+        # "save button" setup
+        save_button = Button(width=400, height=50, text='Save settings',
+            object_name='save_button', clicked_function=self.change_config)
+        self.layout.addWidget(save_button, self.layout.count(), 0, 1, 2)
+
+        # empty space between "variables" and "general"
+        empty_space = EmptySpace(width=400, height=20)
+        self.layout.addWidget(empty_space, self.layout.count(), 0, 1, 1)
+
+        # general header setup
+        header_general = TextHeader(text='General')
+        self.layout.addWidget(header_general, self.layout.count(), 0, 1, 2)
+
+        # general settings setup
+        clear_shared_data_label = QLabel('Clear shared data:')
+        clear_shared_data_button = Button(width=300, height=50, text='Clear',
+            clicked_function=self.clear_shared_data,
+            object_name='clear_shared_data_button')
+
+        self.layout.addWidget(clear_shared_data_label, 
+            self.layout.count(), 0, 1, 1)
+        self.layout.addWidget(clear_shared_data_button, 
+            self.layout.count() - 1, 1, 1, 1)
+
+        # and repair bug relating scrollbar after removing shared data
+
+        # result info setup
+        self.result_info = QLabel('')
+        self.result_info.setAlignment(Qt.AlignCenter)
+        self.layout.addWidget(self.result_info, self.layout.count(), 0, 1, 2)
 
         self.setLayout(self.layout)
+
+    def change_config(self):
+        for config_name, value_obj in self.values.items():
+            setattr(self.config, config_name, value_obj.input_text)
+        self.config.save_config()
+        self.result_info.setText(
+            textwrap.dedent(self.TEXTS['config_changed']))
+
+    def clear_shared_data(self):
+        self.shared_data.clear_shared_data()
+        self.result_info.setText(self.TEXTS['shared_data_cleaned'])

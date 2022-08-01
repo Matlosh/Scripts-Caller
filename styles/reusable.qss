@@ -80,3 +80,7 @@ QDateTimeEdit::drop-down {
     height: 32px;
     subcontrol-position: right center;
 }
+
+QLabel#text_header {
+    font-weight: bold;
+}

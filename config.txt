@@ -1,0 +1,8 @@
+
+# Note: anything except values shouldn't be changed, doing that may result in
+# not correct work of the application!
+# Note: playing with wrong types of values may also result in not correct work
+# of the application!
+
+window_width=1000
+window_height=615

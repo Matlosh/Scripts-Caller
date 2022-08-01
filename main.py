@@ -4,14 +4,16 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QWidget, QMainWindow, QLabel, QVBoxLayout, QMenuBar,
-    QToolBar, QDockWidget, QSystemTrayIcon, QMenu, QHBoxLayout, QGridLayout
+    QToolBar, QDockWidget, QSystemTrayIcon, QMenu, QHBoxLayout, QGridLayout,
+    QDialog
 )
 from PySide6.QtCore import Slot, Qt, QThread
 from PySide6.QtGui import QIcon, QAction
-from config import config
+from config import Config
 from components.application_topbar import ApplicationTopBar
 from components.menu import Menu
 from components.content import Content
+from components.application_footer import ApplicationFooter
 from utils.functions import read_stylesheets, ExecuteScheduledCommands
 from data.shared_data import SharedData
 
@@ -26,9 +28,11 @@ class ScriptsCaller(QMainWindow):
         # self.setWindowFlag(Qt.WindowStaysOnTopHint)
         self.setWindowFlag(Qt.Tool, True)
 
+        config = Config()
+
         # Config settings
-        self.resize(config['window_width'], config['window_height'])
-        self.setFixedSize(config['window_width'], config['window_height'])
+        self.resize(config.window_width, config.window_height)
+        self.setFixedSize(config.window_width, config.window_height)
 
         self.shared_data = SharedData()
 
@@ -75,6 +79,10 @@ class ScriptsCaller(QMainWindow):
         menu = Menu(content, self.shared_data,
             self.execute_scheduled_commands)
         main_layout.addWidget(menu, 1, 0)
+
+        # Application footer
+        application_footer = ApplicationFooter()
+        main_layout.addWidget(application_footer, 2, 0, 1, 1)
 
         # menu_n_content_layout.setColumnStretch(1, 1)
         # menu_n_content_layout.setSpacing(0)

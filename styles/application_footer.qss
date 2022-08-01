@@ -1,0 +1,16 @@
+QWidget#application_footer {
+    background-color: @primary_darker;
+}
+
+QWidget#application_footer > QLabel {
+    font-size: 10px;
+    color: @text_darker_2;
+}
+
+QWidget#application_footer > QLabel#application_footer_author {
+    padding: 0 0 0 5px;
+}
+
+QWidget#application_footer > QLabel#application_footer_version {
+    padding: 0 5px 0 0;
+}

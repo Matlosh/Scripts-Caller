@@ -370,7 +370,7 @@ class Settings(QWidget):
 
         self.TEXTS = {
             'config_changed': "All changes will be available after app's reload.",
-            'shared_data_cleaned': 'Shared data was cleaned.'
+            'shared_data_cleaned': 'Shared data was cleared.'
         }
 
         self.variables_settings_inputs = [

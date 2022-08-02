@@ -29,38 +29,38 @@ Currently menu contains four elements:
 
 ![App's menu screenshot](assets/images/menu.png)
 
-To change app's content simply click any of the menu options.
+To change app's content simply click on any of the menu's options.
 
 ### Brief description of the available options
 
-**Execute command** - allows to execute one or more commands one after another or all at the same time.
+**Execute command** - allows to execute one or more scripts or commands one after another or all at the same time.
 
 GUI contains: 
-- "Execute all at once" button - changes whether all given scripts or commands should be executed all at once (if not checked then all scripts/commands will be executed one after another)
+- "Execute all at once" button - changes whether all given scripts or commands should be executed all at once (if not checked then all scripts and commands will be executed one after another)
 - "Execute" button - simply starts execution process
-- "+" button - adds new line to execute another script or command
+- "+" button - adds a new line to execute another script or command
 - "Command to execute" input - in that input script or command that has to be executed should be written
 - "Execution path" input - that input should contain - for example - path of the script that has to be executed (if command or script doesn't need a path - it is some sort of system command or similar - this input doesn't need to be changed and can be left as it is at the start)
 
 ![Execute command's content screenshot](assets/images/execute_command_content.png)
 
-**Schedule command** - allows to schedule one or more commands to execute at the set time.
+**Schedule command** - allows to schedule one or more scripts or commands to execute at the set time.
 
 GUI contains:
 - "Add to schedule" button - adds the given script(s) or command(s) with their settings to the schedule list
-- "+" button - adds new line to enter new script or command and set their schedule settings
+- "+" button - adds a new line to enter new script or command and set their schedule settings that will be added to the schedule list
 - "Date and time" input - that input sets planned script's or command's execution time
 - "Command to execute" input - (same as in the "Execute command" option)
 - "Execution path" input - (same as in the "Execute command" option)
 
 ![Schedule command's content screenshot](assets/images/schedule_command_content.png)
 
-**Scheduled commands list** - shows all scheduled commands, path and their planned execution time.
+**Scheduled commands list** - shows all scheduled commands, their path and planned execution time.
 
 GUI contains:
 - Each scheduled command's entry - consisted of (starting from the left):
-  - red or green color - red means that scheduled script should have already fired and green that script will run
-  - "Command to execute" - command that will be or was executed
+  - red or green color - red means that the scheduled script should have already fired and green that the script will run
+  - "Command to execute" - script or command that will be or was executed
   - "Execution path" - path where script or command will be or was executed
   - "Execution date and time" - date and time when script or command will be or was executed
 
@@ -70,35 +70,37 @@ GUI contains:
 
 GUI contains:
 - Header of the elements in the settings
-- Actual settings (which contents may differ depending on the things that have to be changed)
+- Actual settings (which contents may differ depending on the things that can be changed)
 
 ![Settings' content](assets/images/settings_content.png)
 
 ### Working in the background
-After clicking "_" (minimize) button, app would be hidden - meaning that it can't be accessed through the 
+After clicking "_" (minimize) button app will be hidden - meaning it will work in the background and can be again opened through clicking on the icon (icon with SC signs) in the "system tray" (on Windows).
+
+![Application in the system tray](assets/images/working_in_the_background.png)
 
 ## Requirements
-Libraries that are needed to successfully run the application are listen in the *requirements.txt* file.
+Libraries that are needed to successfully run the application are listed in the *requirements.txt* file.
 
 ## Gallery - usage examples
 
 ### Execute command's "one after another" mode usage example
-Below scripts are executed one after another and each script execution can be easily stopped by clicking red "x" button. **Note that script or command will automatically go to the next if execution has ended.**
+Below scripts are executed one after another and each script execution can be easily stopped by clicking the red "x" button. **Note that script or command will automatically go to the next if execution has ended.**
 
 ![Execute command's "one after another" mode usage example screenshot](assets/images/execute_command_one_after_another_example.png)
 
 ### Execute command's "all at once" mode usage example
-Below scripts are executed all at once and scripts can be easily stopped individually by clicking red "x" button. **Note that red "x" button will disappear near the script's or command's row that has already ended.**
+Below scripts are executed all at once and scripts can be easily stopped individually by clicking the red "x" button. **Note that the red "x" button will automatically disappear near the script's or command's row that has already ended.**
 
 ![Execute command's "all at once" mode usage example screenshot](assets/images/execute_command_all_at_once_example.png)
 
 ### Schedule command's usage example
-Below screenshot adds two commands (one is system command and the second is Python's script execution) at the two different dates.
+Below screenshot adds two commands (first one is system command and the second one is Python's script execution) at the two different dates.
 
 ![Schedule command's usage example](assets/images/schedule_command_example.png)
 
 ### Scheduled command's list usage example
-Below screenshot shows two planned entries (created on the above screenshot).
+Below screenshot shows two planned entries (created in the above screenshot).
 
 ![Scheduled command's list usage example](assets/images/scheduled_commands_list_example.png)
 

@@ -5,7 +5,7 @@
 Scripts Caller is an application made in Python (and using PySide6 library) to easily execute and schedule execution of various python scripts, cmd commands or similar. Application also provides simple list to check when scripts should be (or were) fired.
 
 ## Usage
-To turn on the application simply use:
+To turn on the application simply install needed libraries (e.g. via pip) and then use:
 ```
 py main.py
 ```

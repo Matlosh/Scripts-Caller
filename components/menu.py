@@ -25,10 +25,10 @@ class Menu(QWidget):
         self.execute_scheduled_commands = execute_scheduled_commands
         self.layout = QVBoxLayout(self)
 
-        insert_command = ExecuteCommand()
+        execute_command = ExecuteCommand()
         menu_item_1 = MenuItem(text='Execute command', 
             icon='assets/icons/keyboard.svg',
-            pressed_function=lambda: self.change_apps_content(insert_command))
+            pressed_function=lambda: self.change_apps_content(execute_command))
         self.layout.addWidget(menu_item_1)
 
         schedule_command = ScheduleCommand(self.shared_data, 
@@ -57,7 +57,7 @@ class Menu(QWidget):
         read_stylesheets('styles/menu.qss', self)
 
         # Setting default loaded content
-        self.change_apps_content(schedule_command)
+        self.change_apps_content(execute_command)
 
     def change_apps_content(self, content):
         if isinstance(content, ScheduledCommandsList):
